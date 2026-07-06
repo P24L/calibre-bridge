@@ -1,0 +1,74 @@
+views:
+  - type: table
+    name: Všechny knihy
+    filters:
+      and:
+        - file.folder == "Books"
+    order:
+      - cover
+      - title
+      - authors
+      - status
+      - rating
+      - date_added
+    sort:
+      - property: date_added
+        direction: DESC
+
+  - type: table
+    name: Čtu
+    filters:
+      and:
+        - file.folder == "Books"
+        - status == "reading"
+    order:
+      - cover
+      - title
+      - authors
+      - date_started
+    sort:
+      - property: date_started
+        direction: DESC
+
+  - type: table
+    name: Nepřečtené
+    filters:
+      and:
+        - file.folder == "Books"
+        - status == "unread"
+    order:
+      - cover
+      - title
+      - authors
+      - rating
+      - date_added
+    sort:
+      - property: date_added
+        direction: DESC
+
+  - type: table
+    name: Přečtené
+    filters:
+      and:
+        - file.folder == "Books"
+        - status == "read"
+    order:
+      - cover
+      - title
+      - authors
+      - rating
+      - date_finished
+    sort:
+      - property: date_finished
+        direction: DESC
+
+  - type: table
+    name: Nedočtené
+    filters:
+      and:
+        - file.folder == "Books"
+        - status == "did-not-finish"
+    order:
+      - cover
+      - title
+      - authors
