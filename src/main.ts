@@ -8,6 +8,11 @@ import { toCalibreKeys } from "./mapper";
 import { buildUuidMap, createNote, saveCover, updateNote } from "./noteWriter";
 import { CalibrePluginSettings, CalibreSettingTab, DEFAULT_SETTINGS } from "./settings";
 
+interface InternalMetadataTypeManager {
+	setType(prop: string, type: string): void;
+	getPropertyInfo(prop: string): { type?: string } | undefined;
+}
+
 export default class CalibreBridgePlugin extends Plugin {
 	settings!: CalibrePluginSettings;
 
@@ -28,15 +33,12 @@ export default class CalibreBridgePlugin extends Plugin {
 	}
 
 	private registerPropertyTypes() {
-		// Use Obsidian's internal metadataTypeManager to register property types.
-		// This makes date fields show a date picker and number fields a number input.
-		// Only sets a type if the property has no type defined yet (respects user customisations).
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const mgr = (this.app as any).metadataTypeManager;
-		if (!mgr?.setType) return;
+		const mgr = (this.app as unknown as { metadataTypeManager?: InternalMetadataTypeManager })
+			.metadataTypeManager;
+		if (!mgr) return;
 
 		const register = (prop: string, type: string) => {
-			if (!mgr.getPropertyInfo?.(prop)?.type) {
+			if (!mgr.getPropertyInfo(prop)?.type) {
 				mgr.setType(prop, type);
 			}
 		};
@@ -50,7 +52,7 @@ export default class CalibreBridgePlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<CalibrePluginSettings>);
 	}
 
 	async saveSettings() {
@@ -106,8 +108,8 @@ export default class CalibreBridgePlugin extends Plugin {
 			}));
 			bookList.sort((a, b) => a.title.localeCompare(b.title));
 
-			new ImportModal(this.app, bookList, async (selectedIds) => {
-				await this.importBooks(api, allMeta, selectedIds);
+			new ImportModal(this.app, bookList, (selectedIds) => {
+				void this.importBooks(api, allMeta, selectedIds);
 			}).open();
 		} catch {
 			fetchNotice.hide();

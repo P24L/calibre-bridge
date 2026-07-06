@@ -35,7 +35,7 @@ export class CalibreSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl("h2", { text: "Calibre Bridge Settings" });
+		new Setting(containerEl).setName("Calibre Bridge Settings").setHeading();
 
 		// Server URL
 		new Setting(containerEl)
@@ -52,11 +52,10 @@ export class CalibreSettingTab extends PluginSettingTab {
 			);
 
 		// Auth
-		containerEl.createEl("h3", { text: "Authentication (optional)" });
-		containerEl.createEl("p", {
-			text: "Credentials are stored in plugin data in plaintext.",
-			cls: "setting-item-description",
-		});
+		new Setting(containerEl)
+			.setName("Authentication (optional)")
+			.setDesc("Credentials are stored in plugin data in plaintext.")
+			.setHeading();
 
 		new Setting(containerEl)
 			.setName("Username")
@@ -82,14 +81,14 @@ export class CalibreSettingTab extends PluginSettingTab {
 			});
 
 		// Library
-		containerEl.createEl("h3", { text: "Library" });
+		new Setting(containerEl).setName("Library").setHeading();
 
 		const libSetting = new Setting(containerEl)
 			.setName("Library")
 			.setDesc("Libraries are fetched automatically. Click the button to refresh.");
 
-		const selectEl = document.createElement("select");
-		selectEl.style.minWidth = "200px";
+		const selectEl = activeDocument.createElement("select");
+		selectEl.setCssStyles({ minWidth: "200px" });
 		this.libraryDropdownEl = selectEl;
 
 		// Show currently saved library while fetch is in progress
@@ -106,9 +105,9 @@ export class CalibreSettingTab extends PluginSettingTab {
 			opt.selected = true;
 		}
 
-		selectEl.addEventListener("change", async () => {
+		selectEl.addEventListener("change", () => {
 			this.plugin.settings.libraryId = selectEl.value;
-			await this.plugin.saveSettings();
+			void this.plugin.saveSettings();
 		});
 
 		libSetting.controlEl.appendChild(selectEl);
@@ -122,7 +121,7 @@ export class CalibreSettingTab extends PluginSettingTab {
 		);
 
 		// Folders
-		containerEl.createEl("h3", { text: "Vault folders" });
+		new Setting(containerEl).setName("Vault folders").setHeading();
 
 		new Setting(containerEl)
 			.setName("Book folder")
@@ -178,7 +177,7 @@ export class CalibreSettingTab extends PluginSettingTab {
 
 		// Auto-fetch on open if server URL is configured
 		if (this.plugin.settings.serverUrl) {
-			this.fetchLibraries({ silent: true });
+			void this.fetchLibraries({ silent: true });
 		}
 	}
 

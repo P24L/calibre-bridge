@@ -89,7 +89,7 @@ export class ImportModal extends Modal {
 			const row = this.listEl.createDiv({ cls: "calibre-book-item" });
 			const checkbox = row.createEl("input", {
 				attr: { type: "checkbox", id: `cb-${book.id}` },
-			}) as HTMLInputElement;
+			});
 			checkbox.checked = this.selected.has(book.id);
 
 			const authorStr = book.authors.length > 0 ? book.authors[0] : "Unknown";

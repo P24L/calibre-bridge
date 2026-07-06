@@ -127,12 +127,13 @@ export async function updateNote(
 
 	// 1. Update Calibre-owned frontmatter keys (preserves all user-owned keys)
 	await app.fileManager.processFrontMatter(file, (fm) => {
+		const safeFm = fm as Record<string, unknown>;
 		for (const [k, v] of Object.entries(calibreKeys)) {
-			fm[k] = v;
+			safeFm[k] = v;
 		}
 		// If cover no longer available, remove the key
 		if (!hasCover) {
-			delete fm["cover"];
+			delete safeFm["cover"];
 		}
 	});
 
@@ -199,7 +200,8 @@ export function buildUuidMap(app: App, settings: CalibrePluginSettings): Map<str
 	const map = new Map<string, TFile>();
 	for (const file of app.vault.getMarkdownFiles()) {
 		if (!file.path.startsWith(prefix)) continue;
-		const uuid = app.metadataCache.getFileCache(file)?.frontmatter?.calibre_uuid;
+		const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as Record<string, unknown> | undefined;
+		const uuid = frontmatter?.["calibre_uuid"];
 		if (uuid) map.set(String(uuid), file);
 	}
 	return map;
