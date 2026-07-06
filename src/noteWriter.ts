@@ -16,29 +16,35 @@ export function sanitizeFilename(name: string): string {
 async function resolveNewFilePath(
 	app: App,
 	book: BookRaw,
-	bookFolder: string
+	settings: CalibrePluginSettings
 ): Promise<string> {
-	const base = sanitizeFilename(book.title);
+	const title = sanitizeFilename(book.title);
 	const author = book.authors?.[0] ? sanitizeFilename(book.authors[0]) : null;
+	const { bookFolder, filenameFormat } = settings;
 
 	const tryPath = (name: string) => normalizePath(`${bookFolder}/${name}.md`);
 
-	if (!app.vault.getAbstractFileByPath(tryPath(base))) {
-		return tryPath(base);
-	}
-	if (author) {
-		const withAuthor = `${base} — ${author}`;
-		if (!app.vault.getAbstractFileByPath(tryPath(withAuthor))) {
-			return tryPath(withAuthor);
+	if (filenameFormat === "author-title") {
+		const base = author ? `${author} — ${title}` : title;
+		if (!app.vault.getAbstractFileByPath(tryPath(base))) return tryPath(base);
+		for (let n = 2; n < 100; n++) {
+			const s = `${base} ${n}`;
+			if (!app.vault.getAbstractFileByPath(tryPath(s))) return tryPath(s);
 		}
+		return tryPath(`${base}-${Date.now()}`);
+	}
+
+	// default: "title"
+	if (!app.vault.getAbstractFileByPath(tryPath(title))) return tryPath(title);
+	if (author) {
+		const withAuthor = `${title} — ${author}`;
+		if (!app.vault.getAbstractFileByPath(tryPath(withAuthor))) return tryPath(withAuthor);
 	}
 	for (let n = 2; n < 100; n++) {
-		const suffixed = author ? `${base} — ${author} ${n}` : `${base} ${n}`;
-		if (!app.vault.getAbstractFileByPath(tryPath(suffixed))) {
-			return tryPath(suffixed);
-		}
+		const s = author ? `${title} — ${author} ${n}` : `${title} ${n}`;
+		if (!app.vault.getAbstractFileByPath(tryPath(s))) return tryPath(s);
 	}
-	return tryPath(`${base}-${Date.now()}`);
+	return tryPath(`${title}-${Date.now()}`);
 }
 
 function serializeFrontmatter(fm: Record<string, unknown>): string {
@@ -84,7 +90,7 @@ export async function createNote(
 	hasCover: boolean,
 	settings: CalibrePluginSettings
 ): Promise<TFile> {
-	const filePath = await resolveNewFilePath(app, book, settings.bookFolder);
+	const filePath = await resolveNewFilePath(app, book, settings);
 
 	// Calibre-owned keys first, then user-owned keys
 	const fm: Record<string, unknown> = {

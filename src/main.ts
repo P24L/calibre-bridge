@@ -19,6 +19,11 @@ export default class CalibreBridgePlugin extends Plugin {
 			name: "Import books from Calibre",
 			callback: () => this.runImport(),
 		});
+		this.addCommand({
+			id: "calibre-create-library-overview",
+			name: "Create library overview",
+			callback: () => this.createLibraryOverview(),
+		});
 	}
 
 	async loadSettings() {
@@ -27,6 +32,23 @@ export default class CalibreBridgePlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	private async createLibraryOverview() {
+		const { bookFolder } = this.settings;
+		const path = normalizePath(`${bookFolder}/Library.base`);
+		const content = buildLibraryBase(bookFolder);
+		try {
+			const existing = this.app.vault.getAbstractFileByPath(path);
+			if (existing) {
+				await this.app.vault.modify(existing as import("obsidian").TFile, content);
+			} else {
+				await this.app.vault.create(path, content);
+			}
+			new Notice(`Calibre Bridge: Library overview created at ${path}`);
+		} catch (e) {
+			new Notice(`Calibre Bridge: Could not create overview — ${e instanceof Error ? e.message : String(e)}`);
+		}
 	}
 
 	private async runImport() {
@@ -153,4 +175,83 @@ export default class CalibreBridgePlugin extends Plugin {
 			`Calibre import done: ${created} created, ${updated} updated${failMsg}.`
 		);
 	}
+}
+
+function buildLibraryBase(bookFolder: string): string {
+	const f = bookFolder;
+	return `views:
+  - type: table
+    name: All Books
+    filters:
+      and:
+        - file.folder == "${f}"
+    order:
+      - cover
+      - title
+      - authors
+      - status
+      - rating
+      - date_added
+    sort:
+      - property: date_added
+        direction: DESC
+
+  - type: table
+    name: Reading
+    filters:
+      and:
+        - file.folder == "${f}"
+        - status == "reading"
+    order:
+      - cover
+      - title
+      - authors
+      - date_started
+    sort:
+      - property: date_started
+        direction: DESC
+
+  - type: table
+    name: Unread
+    filters:
+      and:
+        - file.folder == "${f}"
+        - status == "unread"
+    order:
+      - cover
+      - title
+      - authors
+      - rating
+      - date_added
+    sort:
+      - property: date_added
+        direction: DESC
+
+  - type: table
+    name: Read
+    filters:
+      and:
+        - file.folder == "${f}"
+        - status == "read"
+    order:
+      - cover
+      - title
+      - authors
+      - rating
+      - date_finished
+    sort:
+      - property: date_finished
+        direction: DESC
+
+  - type: table
+    name: Did Not Finish
+    filters:
+      and:
+        - file.folder == "${f}"
+        - status == "did-not-finish"
+    order:
+      - cover
+      - title
+      - authors
+`;
 }

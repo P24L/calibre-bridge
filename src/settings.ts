@@ -1,6 +1,8 @@
 import { App, Notice, PluginSettingTab, Setting, requestUrl } from "obsidian";
 import type CalibreBridgePlugin from "./main";
 
+export type FilenameFormat = "title" | "author-title";
+
 export interface CalibrePluginSettings {
 	serverUrl: string;
 	libraryId: string;
@@ -9,6 +11,7 @@ export interface CalibrePluginSettings {
 	bookFolder: string;
 	coverFolder: string;
 	downloadCovers: boolean;
+	filenameFormat: FilenameFormat;
 }
 
 export const DEFAULT_SETTINGS: CalibrePluginSettings = {
@@ -19,6 +22,7 @@ export const DEFAULT_SETTINGS: CalibrePluginSettings = {
 	bookFolder: "Books",
 	coverFolder: "Books/covers",
 	downloadCovers: true,
+	filenameFormat: "title",
 };
 
 export class CalibreSettingTab extends PluginSettingTab {
@@ -154,6 +158,20 @@ export class CalibreSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.downloadCovers)
 					.onChange(async (value) => {
 						this.plugin.settings.downloadCovers = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Note filename")
+			.setDesc("How new book notes are named. Existing notes are never renamed.")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("title", "Title")
+					.addOption("author-title", "Author — Title")
+					.setValue(this.plugin.settings.filenameFormat)
+					.onChange(async (value) => {
+						this.plugin.settings.filenameFormat = value as FilenameFormat;
 						await this.plugin.saveSettings();
 					})
 			);
