@@ -200,7 +200,7 @@ export function buildUuidMap(app: App, settings: CalibrePluginSettings): Map<str
 	const map = new Map<string, TFile>();
 	for (const file of app.vault.getMarkdownFiles()) {
 		if (!file.path.startsWith(prefix)) continue;
-		const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter as Record<string, unknown> | undefined;
+		const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
 		const uuid = frontmatter?.["calibre_uuid"];
 		if (uuid) map.set(String(uuid), file);
 	}

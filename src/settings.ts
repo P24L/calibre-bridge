@@ -35,7 +35,6 @@ export class CalibreSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		new Setting(containerEl).setName("Calibre Bridge Settings").setHeading();
 
 		// Server URL
 		new Setting(containerEl)
