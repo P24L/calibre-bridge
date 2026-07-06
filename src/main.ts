@@ -13,6 +13,7 @@ export default class CalibreBridgePlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		this.registerPropertyTypes();
 		this.addSettingTab(new CalibreSettingTab(this.app, this));
 		this.addCommand({
 			id: "calibre-import-books",
@@ -24,6 +25,28 @@ export default class CalibreBridgePlugin extends Plugin {
 			name: "Create library overview",
 			callback: () => this.createLibraryOverview(),
 		});
+	}
+
+	private registerPropertyTypes() {
+		// Use Obsidian's internal metadataTypeManager to register property types.
+		// This makes date fields show a date picker and number fields a number input.
+		// Only sets a type if the property has no type defined yet (respects user customisations).
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const mgr = (this.app as any).metadataTypeManager;
+		if (!mgr?.setType) return;
+
+		const register = (prop: string, type: string) => {
+			if (!mgr.getPropertyInfo?.(prop)?.type) {
+				mgr.setType(prop, type);
+			}
+		};
+
+		for (const prop of ["date_started", "date_finished", "published", "date_added"]) {
+			register(prop, "date");
+		}
+		for (const prop of ["rating", "series_index", "calibre_id"]) {
+			register(prop, "number");
+		}
 	}
 
 	async loadSettings() {
