@@ -65,14 +65,14 @@ Copy `main.js`, `styles.css`, and `manifest.json` to `<vault>/.obsidian/plugins/
 
 ## Calibre Content Server API
 
-All requests go through Obsidian's `requestUrl` (bypasses CORS). Optional Basic auth header is added when credentials are configured.
+All requests go through Obsidian's `requestUrl` (bypasses CORS). An optional Basic auth header is added when credentials are configured.
 
 | Endpoint | Used for |
 |---|---|
 | `GET /ajax/library-info` | List libraries, get default |
 | `GET /ajax/search?query=&num=20000` | Get all book IDs |
 | `GET /ajax/books?ids=1,2,3` | Batch metadata (100 IDs per request) |
-| `GET /get/cover/<id>` | Cover image (arraybuffer, 404 = no cover) |
+| `GET /get/cover/<id>` | Cover image (arraybuffer; 404 = no cover) |
 
 ### Metadata normalization
 

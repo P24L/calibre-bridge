@@ -1,106 +1,106 @@
 # Calibre Bridge
 
-Plugin pro [Obsidian](https://obsidian.md), který propojí tvou [Calibre](https://calibre-ebook.com) knihovnu s Obsidianem. Jedním příkazem importuje vybrané knihy — každá dostane vlastní poznámku s obálkou, popisem a metadaty (série, hodnocení, tagy…).
+An [Obsidian](https://obsidian.md) plugin that connects your [Calibre](https://calibre-ebook.com) library to Obsidian. With a single command you can import selected books — each gets its own note with a cover image, description, and metadata (series, rating, tags…).
 
-Re-import je bezpečný: tvoje poznámky a stav čtení zůstanou nedotčené, aktualizují se jen data z Calibre.
-
----
-
-## Co plugin dělá
-
-Pro každou importovanou knihu vytvoří poznámku v Obsidianu:
-
-- **Frontmatter** s metadaty: titul, autoři, série, hodnocení, tagy, ISBN, datum přidání…
-- **Obálka** (stažená z Calibre serveru)
-- **Popis knihy** (z Calibre, převedený do Markdownu)
-- **Tvůj prostor** pod popisem — sem si piš co chceš, plugin se tam nikdy nedotkne
-
-Stav čtení (`status`, `date_started`, `date_finished`) si nastavuješ sám a re-import ho nepřepíše.
+Re-importing is safe: your notes and reading status are never touched — only the data coming from Calibre is refreshed.
 
 ---
 
-## Požadavky
+## What it does
 
-- Calibre 5.0 nebo novější
-- Obsidian 1.6 nebo novější
-- Funguje pouze na desktopu (Windows, macOS, Linux)
+For each imported book the plugin creates a note in your vault:
 
----
+- **Frontmatter** with metadata: title, authors, series, rating, tags, ISBN, date added…
+- **Cover image** (downloaded from the Calibre server)
+- **Book description** (from Calibre, converted to Markdown)
+- **Your space** below the description — write whatever you want there, the plugin will never touch it
 
-## Krok 1: Spusť Content Server v Calibre
-
-Calibre má zabudovaný HTTP server, přes který plugin čte data. Musí běžet vždy, když chceš importovat.
-
-**Spuštění:** V Calibre klikni na **Connect/share → Start Content Server**.
-
-![Spuštění Content Serveru](https://user-images.githubusercontent.com/150803/143490663-afc3b418-a36e-422a-bab7-97b09237b507.png)
-
-Server poběží na portu **8080** (pokud nezměníš). Adresa bude vypadat nějak takto: `http://192.168.1.10:8080` — IP adresu svého počítače najdeš v nastavení Calibre nebo v systémových nastaveních sítě.
-
-**Trvalé spuštění:** Pokud chceš, aby server startoval automaticky s Calibre, jdi do **Preferences → Sharing → Sharing over the net** a zaškrtni *Start the Content server automatically at startup*.
-
-### Přístup přes heslo (volitelné)
-
-Pokud je Calibre dostupný z internetu nebo ho sdílíš s někým, kdo přístup mít nemá, doporučuji nastavit heslo: **Preferences → Sharing → Sharing over the net → Require username and password**.
+The reading status (`status`, `date_started`, `date_finished`) is yours to manage and will never be overwritten on re-import.
 
 ---
 
-## Krok 2: Nainstaluj plugin
+## Requirements
 
-1. Stáhni `main.js`, `styles.css` a `manifest.json` z [nejnovějšího release](../../releases/latest).
-2. V souborovém manažeru přejdi do svého vaultu a otevři skrytou složku `.obsidian/plugins/`.
-3. Vytvoř tam novou složku `calibre-bridge`.
-4. Zkopíruj stažené soubory do té složky.
-5. V Obsidianu jdi do **Settings → Community plugins**, klikni na **Reload** a zapni **Calibre Bridge**.
+- Calibre 5.0 or newer
+- Obsidian 1.6 or newer
+- Desktop only (Windows, macOS, Linux)
 
 ---
 
-## Krok 3: Nastav plugin
+## Step 1: Start the Content Server in Calibre
 
-Jdi do **Settings → Calibre Bridge**.
+Calibre has a built-in HTTP server that the plugin uses to read your data. It needs to be running whenever you want to import.
 
-**Server URL** — zadej adresu svého Calibre serveru, např. `http://192.168.1.10:8080`. Pokud k Calibre přistupuješ přes Tailscale nebo jiný VPN, použij tu příslušnou IP.
+**To start it:** In Calibre click **Connect/share → Start Content Server**.
 
-**Username / Password** — vyplň jen pokud jsi v Calibre nastavil přihlášení.
+![Starting the Content Server](https://user-images.githubusercontent.com/150803/143490663-afc3b418-a36e-422a-bab7-97b09237b507.png)
 
-**Library** — po zadání URL se knihovny načtou automaticky. Pokud máš víc knihoven, vyber správnou z nabídky.
+The server runs on port **8080** by default. The address will look something like `http://192.168.1.10:8080` — you can find your machine's IP address in the Calibre sharing settings or your system's network settings.
 
-**Book folder** a **Cover folder** — kam se mají ukládat poznámky a obálky. Defaultně `Books` a `Books/covers`.
+**Start automatically:** If you want the server to start with Calibre, go to **Preferences → Sharing → Sharing over the net** and check *Start the Content server automatically at startup*.
 
----
+### Password protection (optional)
 
-## Krok 4: Importuj knihy
-
-1. Otevři příkazovou paletu (`Cmd+P` na Macu, `Ctrl+P` na Windows/Linux).
-2. Spusť příkaz **Calibre Bridge: Import books from Calibre**.
-3. Zobrazí se seznam všech knih z Calibre — hledej podle názvu nebo autora.
-4. Vyber knihy, které chceš importovat (kliknutí na řádek nebo zaškrtávátko).
-5. Klikni na **Import N books**.
-
-Hotovo — poznámky se vytvoří ve složce `Books`.
-
-### Re-import
-
-Pokud v Calibre aktualizuješ metadata nebo chceš obnovit popis, stačí spustit import znovu. Plugin pozná, které knihy už importované jsou, a jen je aktualizuje. Tvůj stav čtení a poznámky zůstanou.
+If Calibre is reachable from outside your home network or you want to restrict access, set up a password: **Preferences → Sharing → Sharing over the net → Require username and password**.
 
 ---
 
-## Přehled knihovny (Obsidian Bases)
+## Step 2: Install the plugin
 
-V repozitáři je soubor `Library.base` — zkopíruj ho do svého vaultu a dostaneš přehlednou tabulku všech importovaných knih s pěti záložkami:
+1. Download `main.js`, `styles.css`, and `manifest.json` from the [latest release](../../releases/latest).
+2. Open your vault folder and navigate to the hidden `.obsidian/plugins/` folder.
+3. Create a new folder called `calibre-bridge` inside it.
+4. Copy the three downloaded files into that folder.
+5. In Obsidian go to **Settings → Community plugins**, click **Reload**, and enable **Calibre Bridge**.
 
-| Záložka | Obsah |
+---
+
+## Step 3: Configure the plugin
+
+Go to **Settings → Calibre Bridge**.
+
+**Server URL** — enter the address of your Calibre server, e.g. `http://192.168.1.10:8080`. If you access Calibre over Tailscale or another VPN, use the appropriate IP address.
+
+**Username / Password** — fill in only if you set up a password in Calibre.
+
+**Library** — libraries are fetched automatically once you enter the URL. If you have more than one library, pick the right one from the dropdown.
+
+**Book folder** and **Cover folder** — where notes and cover images are saved. Defaults to `Books` and `Books/covers`.
+
+---
+
+## Step 4: Import books
+
+1. Open the command palette (`Cmd+P` on Mac, `Ctrl+P` on Windows/Linux).
+2. Run **Calibre Bridge: Import books from Calibre**.
+3. A list of all books in your Calibre library appears — search by title or author.
+4. Select the books you want (click a row or the checkbox).
+5. Click **Import N books**.
+
+The notes will appear in your `Books` folder.
+
+### Re-importing
+
+If you update metadata in Calibre or want to refresh a description, just run the import again. The plugin recognises which books are already in your vault and updates them — your reading status and notes are left untouched.
+
+---
+
+## Library overview (Obsidian Bases)
+
+The repository includes a `Library.base` file — copy it into your vault to get a ready-made Obsidian Bases overview of all your imported books, with five views:
+
+| View | Shows |
 |---|---|
-| Všechny knihy | Celá knihovna, seřazená podle data přidání |
-| Čtu | Knihy se stavem `reading` |
-| Nepřečtené | Knihy se stavem `unread` |
-| Přečtené | Knihy se stavem `read` |
-| Nedočtené | Knihy se stavem `did-not-finish` |
+| All Books | Your full library, sorted by date added |
+| Reading | Books with status `reading` |
+| Unread | Books with status `unread` |
+| Read | Books with status `read` |
+| Did Not Finish | Books with status `did-not-finish` |
 
-Stav čtení nastavíš přímo ve frontmatter poznámky — pole `status`. Platné hodnoty jsou `unread`, `reading`, `read`, `did-not-finish`.
+Set the reading status directly in a book note's frontmatter — the `status` field. Valid values: `unread`, `reading`, `read`, `did-not-finish`.
 
 ---
 
-## Licence
+## License
 
 MIT
