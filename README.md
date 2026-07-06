@@ -145,9 +145,11 @@ Run **Calibre Bridge: Create library overview** from the command palette to gene
 
 ---
 
-## Network access
+## Permissions and data access
 
-This plugin connects only to the Calibre Content Server at the URL you configure in settings. No other servers or external services are contacted. All requests use Obsidian's built-in `requestUrl` function.
+**Network:** The plugin connects only to the Calibre Content Server at the URL you configure in settings. No other servers or external services are contacted. All requests use Obsidian's built-in `requestUrl` function.
+
+**Vault files:** The plugin scans note frontmatter in your configured book folder to detect which books have already been imported (matched by `calibre_uuid`). This is required to update existing notes instead of creating duplicates. No file content outside the book folder is read or modified.
 
 ---
 
