@@ -23,7 +23,34 @@ The reading status (`status`, `date_started`, `date_finished`) is yours to manag
 
 - Calibre 5.0 or newer
 - Obsidian 1.6 or newer
-- Desktop only (Windows, macOS, Linux)
+- Works on desktop and mobile
+
+---
+
+## Installation
+
+### From the community plugin directory (recommended)
+
+1. In Obsidian go to **Settings → Community plugins → Browse**.
+2. Search for **Calibre Bridge**.
+3. Click **Install**, then **Enable**.
+
+### Beta install via BRAT
+
+If the plugin is not yet in the community directory, install it with [BRAT](https://github.com/TfTHacker/obsidian42-brat):
+
+1. Install and enable the **BRAT** plugin.
+2. Open **Settings → BRAT → Add Beta plugin**.
+3. Enter `P24L/calibre-bridge` and click **Add plugin**.
+4. Enable **Calibre Bridge** in **Settings → Community plugins**.
+
+### Manual install
+
+1. Download `main.js`, `styles.css`, and `manifest.json` from the [latest release](../../releases/latest).
+2. Open your vault folder and navigate to `.obsidian/plugins/`.
+3. Create a new folder called `calibre-bridge` inside it.
+4. Copy the three downloaded files into that folder.
+5. In Obsidian go to **Settings → Community plugins**, click **Reload**, and enable **Calibre Bridge**.
 
 ---
 
@@ -32,8 +59,6 @@ The reading status (`status`, `date_started`, `date_finished`) is yours to manag
 Calibre has a built-in HTTP server that the plugin uses to read your data. It needs to be running whenever you want to import.
 
 **To start it:** In Calibre click **Connect/share → Start Content Server**.
-
-![Starting the Content Server](https://user-images.githubusercontent.com/150803/143490663-afc3b418-a36e-422a-bab7-97b09237b507.png)
 
 The server runs on port **8080** by default. The address will look something like `http://192.168.1.10:8080` — you can find your machine's IP address in the Calibre sharing settings or your system's network settings.
 
@@ -45,17 +70,7 @@ If Calibre is reachable from outside your home network or you want to restrict a
 
 ---
 
-## Step 2: Install the plugin
-
-1. Download `main.js`, `styles.css`, and `manifest.json` from the [latest release](../../releases/latest).
-2. Open your vault folder and navigate to the hidden `.obsidian/plugins/` folder.
-3. Create a new folder called `calibre-bridge` inside it.
-4. Copy the three downloaded files into that folder.
-5. In Obsidian go to **Settings → Community plugins**, click **Reload**, and enable **Calibre Bridge**.
-
----
-
-## Step 3: Configure the plugin
+## Step 2: Configure the plugin
 
 Go to **Settings → Calibre Bridge**.
 
@@ -63,13 +78,15 @@ Go to **Settings → Calibre Bridge**.
 
 **Username / Password** — fill in only if you set up a password in Calibre.
 
+> **Note:** Credentials are stored in plaintext in `.obsidian/plugins/calibre-bridge/data.json`. Do not sync your vault to untrusted locations if you use a password.
+
 **Library** — libraries are fetched automatically once you enter the URL. If you have more than one library, pick the right one from the dropdown.
 
 **Book folder** and **Cover folder** — where notes and cover images are saved. Defaults to `Books` and `Books/covers`.
 
 ---
 
-## Step 4: Import books
+## Step 3: Import books
 
 1. Open the command palette (`Cmd+P` on Mac, `Ctrl+P` on Windows/Linux).
 2. Run **Calibre Bridge: Import books from Calibre**.
@@ -85,9 +102,38 @@ If you update metadata in Calibre or want to refresh a description, just run the
 
 ---
 
+## Note structure
+
+Each book note has two zones:
+
+| Zone | Who controls it |
+|---|---|
+| Frontmatter — Calibre fields (title, authors, tags…) | Plugin — refreshed on every re-import |
+| Frontmatter — reading fields (status, date_started, date_finished) | You — never touched by the plugin |
+| Body between `<!-- calibre:begin -->` and `<!-- calibre:end -->` | Plugin — cover + description |
+| Everything after `<!-- calibre:end -->` | You — your notes, forever safe |
+
+### Calibre-owned frontmatter fields
+
+These are overwritten every time you re-import: `title`, `authors`, `series`, `series_index`, `rating`, `tags`, `publisher`, `published`, `language`, `isbn`, `calibre_uuid`, `calibre_id`, `date_added`, `cover`.
+
+> **Tags caveat:** The `tags` field comes from Calibre. If you add values to `tags` manually in a note's frontmatter, they will be overwritten on the next re-import. Use a separate field (e.g. `my_tags`) for your own tagging.
+
+### Reading status fields
+
+Set these yourself — the plugin never overwrites them:
+
+| Field | Type | Values |
+|---|---|---|
+| `status` | text | `unread` · `reading` · `read` · `did-not-finish` |
+| `date_started` | date | YYYY-MM-DD |
+| `date_finished` | date | YYYY-MM-DD |
+
+---
+
 ## Library overview (Obsidian Bases)
 
-The repository includes a `Library.base` file — copy it into your vault to get a ready-made Obsidian Bases overview of all your imported books, with five views:
+Run **Calibre Bridge: Create library overview** from the command palette to generate a `Library.base` file in your book folder. It gives you a ready-made Bases view of all imported books with five tabs:
 
 | View | Shows |
 |---|---|
@@ -97,10 +143,14 @@ The repository includes a `Library.base` file — copy it into your vault to get
 | Read | Books with status `read` |
 | Did Not Finish | Books with status `did-not-finish` |
 
-Set the reading status directly in a book note's frontmatter — the `status` field. Valid values: `unread`, `reading`, `read`, `did-not-finish`.
+---
+
+## Network access
+
+This plugin connects only to the Calibre Content Server at the URL you configure in settings. No other servers or external services are contacted. All requests use Obsidian's built-in `requestUrl` function.
 
 ---
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

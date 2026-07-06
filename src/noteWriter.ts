@@ -195,7 +195,7 @@ function syncCoverEmbed(before: string, coverEmbed: string, hasCover: boolean): 
 }
 
 export function buildUuidMap(app: App, settings: CalibrePluginSettings): Map<string, TFile> {
-	const prefix = settings.bookFolder + "/";
+	const prefix = normalizePath(settings.bookFolder) + "/";
 	const map = new Map<string, TFile>();
 	for (const file of app.vault.getMarkdownFiles()) {
 		if (!file.path.startsWith(prefix)) continue;

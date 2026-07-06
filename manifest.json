@@ -3,7 +3,8 @@
 	"name": "Calibre Bridge",
 	"version": "1.0.0",
 	"minAppVersion": "1.6.0",
-	"description": "Import book metadata from a Calibre Content Server as structured Obsidian notes.",
-	"author": "calibre-bridge",
-	"isDesktopOnly": true
+	"description": "Import books from a Calibre Content Server as Markdown notes with structured frontmatter, cover images, and descriptions. Reading status and personal notes are preserved across re-imports.",
+	"author": "P24L",
+	"authorUrl": "https://github.com/P24L",
+	"isDesktopOnly": false
 }

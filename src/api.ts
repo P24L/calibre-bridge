@@ -109,7 +109,7 @@ export class CalibreApi {
 		} catch (e) {
 			const status = (e as { status?: number })?.status;
 			if (status !== 404) {
-				console.warn(`Calibre: cover fetch failed for book ${bookId}:`, e);
+				console.error(`Calibre: cover fetch failed for book ${bookId}:`, e);
 			}
 			return null;
 		}
