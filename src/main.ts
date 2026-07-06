@@ -30,6 +30,11 @@ export default class CalibreBridgePlugin extends Plugin {
 			name: "Create library overview",
 			callback: () => this.createLibraryOverview(),
 		});
+		this.addCommand({
+			id: "calibre-sync-imported",
+			name: "Sync all imported books",
+			callback: () => { void this.runSync(); },
+		});
 	}
 
 	private registerPropertyTypes() {
@@ -73,6 +78,44 @@ export default class CalibreBridgePlugin extends Plugin {
 			new Notice(`Calibre Bridge: Library overview created at ${path}`);
 		} catch (e) {
 			new Notice(`Calibre Bridge: Could not create overview — ${e instanceof Error ? e.message : String(e)}`);
+		}
+	}
+
+	private async runSync(): Promise<void> {
+		if (!this.settings.serverUrl) {
+			new Notice("Calibre Bridge: Please enter a server URL in settings.");
+			return;
+		}
+		if (!this.settings.libraryId) {
+			new Notice("Calibre Bridge: Please select a library in settings first.");
+			return;
+		}
+
+		const prefix = normalizePath(this.settings.bookFolder) + "/";
+		const ids: number[] = [];
+		for (const file of this.app.vault.getMarkdownFiles()) {
+			if (!file.path.startsWith(prefix)) continue;
+			const fm = this.app.metadataCache.getFileCache(file)?.frontmatter;
+			const calibreId = fm?.["calibre_id"];
+			if (calibreId !== undefined && calibreId !== null) {
+				ids.push(Number(calibreId));
+			}
+		}
+
+		if (ids.length === 0) {
+			new Notice("Calibre Bridge: No imported books found in vault.");
+			return;
+		}
+
+		const api = new CalibreApi(this.settings);
+		const fetchNotice = new Notice(`Calibre: Fetching metadata for ${ids.length} books…`, 0);
+
+		try {
+			const allMeta = await api.getBooks(ids);
+			fetchNotice.hide();
+			await this.importBooks(api, allMeta, ids);
+		} catch {
+			fetchNotice.hide();
 		}
 	}
 

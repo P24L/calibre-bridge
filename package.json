@@ -1,6 +1,6 @@
 {
 	"name": "calibre-bridge",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"description": "Import book metadata from Calibre Content Server as Obsidian notes.",
 	"main": "main.js",
 	"scripts": {
