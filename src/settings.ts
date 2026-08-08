@@ -15,7 +15,7 @@ export interface CalibrePluginSettings {
 }
 
 export const DEFAULT_SETTINGS: CalibrePluginSettings = {
-	serverUrl: "http://192.168.0.25:8080",
+	serverUrl: "http://localhost:8080",
 	libraryId: "",
 	username: "",
 	password: "",

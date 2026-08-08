@@ -1,16 +1,30 @@
 # Calibre Bridge
 
-Import books from your [Calibre](https://calibre-ebook.com) library as structured notes, complete with cover images, descriptions, and metadata.
+Bring your [Calibre](https://calibre-ebook.com) library into Obsidian — one structured note per book, with cover, metadata, description, and your Kobo highlights, kept in sync without ever touching the notes you write yourself.
 
-Re-importing is safe — your personal notes and reading status are never overwritten, only the Calibre data is refreshed.
+![Imported book note with cover, metadata and highlights](docs/screenshots/hero-note.png)
+![Import modal with book search](docs/screenshots/hero-import.png)
 
-## How to use
+## What you get
 
-Enable Calibre's built-in Content Server (**Connect/share → Start Content Server**) and point the plugin at it in settings. Then run **Import books from Calibre** from the command palette, pick any books from the list, and they appear in your vault.
+- **One note per book** — cover image, title, authors, series, rating, tags, publisher, ISBN, and more, all in frontmatter
+- **Kobo highlights**, if you've fetched them into Calibre — quoted passages grouped by chapter, kept separate from the book description
+- **Safe re-import** — re-running the import only refreshes Calibre-owned data; your `status`, `date_started`, `date_finished`, and anything you write below the managed section are never touched
+- **Library overview** — a ready-made [Bases](https://help.obsidian.md/bases) view with Reading / Unread / Read / Did Not Finish tabs
 
-Each book note contains a cover image, description, and frontmatter fields such as title, authors, series, rating, and tags. Three fields are yours to manage and will never be touched on re-import: `status`, `date_started`, and `date_finished`.
+## Getting started
 
-Run **Create library overview** to generate a Bases file in your book folder with five pre-built views — All Books, Reading, Unread, Read, and Did Not Finish — filtered automatically by reading status.
+1. In Calibre, open **Connect/share → Start Content Server**.
+
+   ![Starting the Calibre Content Server](docs/screenshots/calibre-content-server.png)
+
+2. In Obsidian, open the plugin settings and point it at your server (`http://localhost:8080` if Calibre runs on the same machine). Click **Fetch libraries** to pick your library.
+
+3. Run **Import books from Calibre** from the command palette, select the books you want, and they'll appear in your vault.
+
+Run **Create library overview** any time to (re)generate the Bases file with pre-built views.
+
+Run **Sync all imported books** to refresh every already-imported book from Calibre in one go — handy after fetching new highlights from your Kobo.
 
 > **Note on tags:** The `tags` field is sourced from Calibre and overwritten on re-import. Use a separate field (e.g. `my_tags`) for your own tags.
 

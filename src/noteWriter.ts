@@ -75,18 +75,30 @@ function serializeFrontmatter(fm: Record<string, unknown>): string {
 	return lines.join("\n");
 }
 
-function buildManagedSection(descMd: string): string {
-	if (!descMd.trim()) {
+export interface NoteSections {
+	descriptionMd: string;
+	highlightsMd: string;
+}
+
+function buildManagedSection(sections: NoteSections): string {
+	const parts: string[] = [];
+	if (sections.descriptionMd.trim()) {
+		parts.push(`## Description\n${sections.descriptionMd.trim()}`);
+	}
+	if (sections.highlightsMd.trim()) {
+		parts.push(`## Highlights\n${sections.highlightsMd.trim()}`);
+	}
+	if (parts.length === 0) {
 		return `${BEGIN_MARKER}\n${END_MARKER}`;
 	}
-	return `${BEGIN_MARKER}\n## Description\n${descMd.trim()}\n${END_MARKER}`;
+	return `${BEGIN_MARKER}\n${parts.join("\n\n")}\n${END_MARKER}`;
 }
 
 export async function createNote(
 	app: App,
 	book: BookRaw,
 	calibreKeys: Record<string, unknown>,
-	descMd: string,
+	sections: NoteSections,
 	hasCover: boolean,
 	settings: CalibrePluginSettings
 ): Promise<TFile> {
@@ -106,7 +118,7 @@ export async function createNote(
 	const body = [
 		fmStr,
 		"",
-		coverEmbed + buildManagedSection(descMd),
+		coverEmbed + buildManagedSection(sections),
 		"",
 		"<!-- everything below this line is yours; it is never touched on re-import -->",
 	].join("\n");
@@ -119,7 +131,7 @@ export async function updateNote(
 	app: App,
 	file: TFile,
 	calibreKeys: Record<string, unknown>,
-	descMd: string,
+	sections: NoteSections,
 	hasCover: boolean,
 	settings: CalibrePluginSettings
 ): Promise<void> {
@@ -139,7 +151,7 @@ export async function updateNote(
 
 	// 2. Update managed body region and cover embed
 	const content = await app.vault.read(file);
-	const updated = updateBody(content, descMd, hasCover, uuid, settings);
+	const updated = updateBody(content, sections, hasCover, uuid, settings);
 	if (updated !== content) {
 		await app.vault.modify(file, updated);
 	}
@@ -147,14 +159,14 @@ export async function updateNote(
 
 function updateBody(
 	content: string,
-	descMd: string,
+	sections: NoteSections,
 	hasCover: boolean,
 	uuid: string,
 	settings: CalibrePluginSettings
 ): string {
 	const beginIdx = content.indexOf(BEGIN_MARKER);
 	const endIdx = content.indexOf(END_MARKER);
-	const newSection = buildManagedSection(descMd);
+	const newSection = buildManagedSection(sections);
 	const coverEmbed = `![[${settings.coverFolder}/${uuid}.jpg]]`;
 
 	if (beginIdx !== -1 && endIdx !== -1 && endIdx > beginIdx) {

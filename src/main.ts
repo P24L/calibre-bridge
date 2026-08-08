@@ -1,6 +1,7 @@
 import { Notice, Plugin, normalizePath } from "obsidian";
 import type { BookRaw } from "./api";
 import { CalibreApi } from "./api";
+import { annotationsToMd, splitCommentsHtml } from "./annotations";
 import { htmlToMd } from "./htmlToMd";
 import type { BookListItem } from "./importModal";
 import { ImportModal } from "./importModal";
@@ -207,7 +208,11 @@ export default class CalibreBridgePlugin extends Plugin {
 				}
 
 				const calibreKeys = toCalibreKeys(book, id, this.settings.coverFolder, hasCover);
-				const descMd = htmlToMd(book.comments ?? "");
+				const { descriptionHtml, annotations } = splitCommentsHtml(book.comments ?? "");
+				const sections = {
+					descriptionMd: htmlToMd(descriptionHtml),
+					highlightsMd: annotations ? annotationsToMd(annotations) : "",
+				};
 				const existingFile = uuidMap.get(book.uuid);
 
 				if (existingFile) {
@@ -215,7 +220,7 @@ export default class CalibreBridgePlugin extends Plugin {
 						this.app,
 						existingFile,
 						calibreKeys,
-						descMd,
+						sections,
 						hasCover,
 						this.settings
 					);
@@ -225,7 +230,7 @@ export default class CalibreBridgePlugin extends Plugin {
 						this.app,
 						book,
 						calibreKeys,
-						descMd,
+						sections,
 						hasCover,
 						this.settings
 					);
